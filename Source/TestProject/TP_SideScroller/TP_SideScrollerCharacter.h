@@ -45,6 +45,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		class TSubclassOf<UGameplayAbility> JumpAbility;
 
+	// The ability in our "Ability 2" slot.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		class TSubclassOf<UGameplayAbility> TurnAbility;
+
 	ATP_SideScrollerCharacter();
 
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;

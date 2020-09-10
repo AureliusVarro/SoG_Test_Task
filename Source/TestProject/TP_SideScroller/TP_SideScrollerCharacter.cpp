@@ -85,6 +85,10 @@ void ATP_SideScrollerCharacter::AddCharacterAbilities_Implementation()
 		{
 			AbilitySystem->GiveAbility(FGameplayAbilitySpec(JumpAbility.GetDefaultObject(), 1, 1));
 		}
+		if (IsValid(TurnAbility))
+		{
+			AbilitySystem->GiveAbility(FGameplayAbilitySpec(TurnAbility.GetDefaultObject()));
+		}
 	}
 
 }
