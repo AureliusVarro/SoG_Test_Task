@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "TP_AttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
@@ -34,6 +35,9 @@ ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 	//AbilitySystemComponent
 	AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
 
+	//AttributeSet
+	AttributeSet = CreateDefaultSubobject<UTP_AttributeSet>(TEXT("AttributeSet"));
+
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
@@ -59,9 +63,12 @@ void ATP_SideScrollerCharacter::BeginPlay()
 
 	AbilitySystem->InitAbilityActorInfo(this, this);
 
-	if (true)
+	if (AbilitySystem)
 	{
 		AddCharacterAbilities();
+		InitializeAttributes();
+		AddStartupEffects();
+
 	}
 }
 
@@ -70,6 +77,40 @@ void ATP_SideScrollerCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	AbilitySystem->BindAbilityActivationToInputComponent(InputComponent, FGameplayAbilityInputBinds("ConfirmInput", "CancelInput", "AbilityInput"));
+}
+
+void ATP_SideScrollerCharacter::InitializeAttributes()
+{
+	if (AbilitySystem && AttributeSet) {
+		FGameplayEffectContextHandle EffectContext = AbilitySystem->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+		
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(DefaultAttributeEffect, 1, EffectContext);
+
+		if (SpecHandle.IsValid()) {
+			FActiveGameplayEffectHandle GEHandle = AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+void ATP_SideScrollerCharacter::AddStartupEffects()
+{
+	if (!AbilitySystem) {
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystem->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	for (TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+		if (SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle GEHandle = AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+
 }
 
 void ATP_SideScrollerCharacter::AddCharacterAbilities_Implementation()
@@ -88,6 +129,14 @@ void ATP_SideScrollerCharacter::AddCharacterAbilities_Implementation()
 		if (IsValid(TurnAbility))
 		{
 			AbilitySystem->GiveAbility(FGameplayAbilitySpec(TurnAbility.GetDefaultObject()));
+		}
+		if (IsValid(LedgeClimbAbility))
+		{
+			AbilitySystem->GiveAbility(FGameplayAbilitySpec(LedgeClimbAbility.GetDefaultObject()));
+		}
+		if (IsValid(SprintAbility))
+		{
+			AbilitySystem->GiveAbility(FGameplayAbilitySpec(SprintAbility.GetDefaultObject(), 1, 2));
 		}
 	}
 
