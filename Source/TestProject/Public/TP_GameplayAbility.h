@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "TP_SideScrollerCharacter.h"
 #include "../TestProject.h"
 #include "TP_GameplayAbility.generated.h"
 
