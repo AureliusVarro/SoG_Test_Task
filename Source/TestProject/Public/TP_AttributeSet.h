@@ -30,6 +30,31 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// Current health points
+	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_Health)
+	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, Health)
+
+	// MaxHealth is its own attribute since GameplayEffects may modify it
+	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_MaxHealth)
+	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, MaxHealth)
+
+	// Health regen rate will passively increase Health every second
+    UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_HealthRegenRate)
+	FGameplayAttributeData HealthRegenRate;
+	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, HealthRegenRate)
+
+	// Armor reduces the amount of damage done by attackers
+    UPROPERTY(BlueprintReadOnly, Category = "Armor", ReplicatedUsing = OnRep_Armor)
+	FGameplayAttributeData Armor;
+	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, Armor)
+
+	// MaxArmor is its own attribute since GameplayEffects may modify it
+	UPROPERTY(BlueprintReadOnly, Category = "Armor", ReplicatedUsing = OnRep_MaxArmor)
+	FGameplayAttributeData MaxArmor;
+	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, MaxArmor)
+	
 	// Current stamina, used to execute special abilities. Capped by MaxStamina.
 	UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_Stamina)
 		FGameplayAttributeData Stamina;
@@ -51,6 +76,21 @@ protected:
 	// (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before)
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 
+	UFUNCTION()
+    virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
+
+	UFUNCTION()
+    virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+
+	UFUNCTION()
+    virtual void OnRep_HealthRegenRate(const FGameplayAttributeData& OldHealthRegenRate);
+
+	UFUNCTION()
+    virtual void OnRep_Armor(const FGameplayAttributeData& OldArmor);
+
+	UFUNCTION()
+    virtual void OnRep_MaxArmor(const FGameplayAttributeData& OldMaxArmor);
+	
 	UFUNCTION()
 		virtual void OnRep_Stamina(const FGameplayAttributeData& OldStamina);
 
