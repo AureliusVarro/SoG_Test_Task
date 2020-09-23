@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Weapons/TP_WeaponBase.h"
 #include "TP_AttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -70,6 +71,19 @@ void ATP_SideScrollerCharacter::BeginPlay()
 		AddStartupEffects();
 
 	}
+
+	//TODO: This isn't working, probably
+	if (CurrentWeaponClass) {
+		FVector Location(0.0f, 0.0f, 0.0f);
+		FRotator Rotation(0.0f, 0.0f, 0.0f);
+		FActorSpawnParameters SpawnInfo;
+
+		CurrentWeapon = GetWorld()->SpawnActor<ATP_WeaponBase>(CurrentWeaponClass, Location, Rotation, SpawnInfo);
+
+		CurrentWeapon->SetOwningCharacter(this);
+		CurrentWeapon->AddAbilities();
+	}
+	
 }
 
 void ATP_SideScrollerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -130,4 +144,9 @@ void ATP_SideScrollerCharacter::AddCharacterAbilities_Implementation()
 bool ATP_SideScrollerCharacter::AddCharacterAbilities_Validate()
 {
 	return true;
+}
+
+FName ATP_SideScrollerCharacter::GetWeaponAttachPoint()
+{
+	return WeaponAttachPoint;
 }
