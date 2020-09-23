@@ -17,7 +17,15 @@ void UTP_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 	
-	if (Attribute == GetMaxStaminaAttribute())
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
+	}
+	if(Attribute == GetMaxArmorAttribute())
+	{
+		AdjustAttributeForMaxChange(Armor, MaxArmor, NewValue, GetArmorAttribute());
+	}
+	else if (Attribute == GetMaxStaminaAttribute())
 	{
 		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetStaminaAttribute());
 	}
@@ -27,7 +35,12 @@ void UTP_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		// Handle health changes.
+		SetStamina(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
 		// Handle stamina changes.
 		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
@@ -52,9 +65,39 @@ void UTP_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, HealthRegenRate, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, MaxArmor, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, StaminaRegenRate, COND_None, REPNOTIFY_Always);
+}
+
+void UTP_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, Health, OldHealth);
+}
+
+void UTP_AttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, MaxHealth, OldMaxHealth);
+}
+
+void UTP_AttributeSet::OnRep_HealthRegenRate(const FGameplayAttributeData& OldHealthRegenRate)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, HealthRegenRate, OldHealthRegenRate);
+}
+
+void UTP_AttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, Armor, OldArmor);
+}
+
+void UTP_AttributeSet::OnRep_MaxArmor(const FGameplayAttributeData& OldMaxArmor)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, MaxArmor, OldMaxArmor);
 }
 
 void UTP_AttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina)
