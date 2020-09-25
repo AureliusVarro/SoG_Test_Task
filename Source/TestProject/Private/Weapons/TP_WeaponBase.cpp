@@ -124,6 +124,26 @@ void ATP_WeaponBase::Unequip()
 	RemoveAbilities();
 }
 
+int32 ATP_WeaponBase::GetClipAmmo() const
+{
+	return ClipAmmo;
+}
+
+int32 ATP_WeaponBase::GetMaxClipAmmo() const
+{
+	return MaxClipAmmo;
+}
+
+void ATP_WeaponBase::SetClipAmmo(int32 NewClipAmmo)
+{
+	ClipAmmo = NewClipAmmo;
+}
+
+void ATP_WeaponBase::SetMaxClipAmmo(int32 NewMaxClipAmmo)
+{
+	MaxClipAmmo = NewMaxClipAmmo;
+}
+
 // Called when the game starts or when spawned
 void ATP_WeaponBase::BeginPlay()
 {

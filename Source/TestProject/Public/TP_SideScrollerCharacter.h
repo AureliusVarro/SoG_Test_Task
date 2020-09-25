@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "TP_GameplayAbility.h"
 #include "TP_AttributeSet.h"
+#include "Weapons/TP_AmmoAttributeSet.h"
 #include "../TestProject.h"
 #include "TP_SideScrollerCharacter.generated.h"
 
@@ -31,6 +32,9 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
 		class UTP_AttributeSet* AttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
+	class UTP_AmmoAttributeSet* AmmoAttributeSet;
 
 protected:
 

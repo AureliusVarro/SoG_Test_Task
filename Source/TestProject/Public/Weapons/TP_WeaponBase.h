@@ -37,6 +37,18 @@ public:
 
 	virtual void Unequip();
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual int32 GetClipAmmo() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual int32 GetMaxClipAmmo() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual void SetClipAmmo(int32 NewClipAmmo);
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual void SetMaxClipAmmo(int32 NewMaxClipAmmo);
+
 protected:
 	UPROPERTY()
 		UAbilitySystemComponent* AbilitySystemComponent;
@@ -52,6 +64,13 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
 		TArray<FGameplayAbilitySpecHandle> AbilitySpecHandles;
+
+	// How much ammo in the clip the gun starts with
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon|Ammo")
+	int32 ClipAmmo;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon|Ammo")
+	int32 MaxClipAmmo;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
