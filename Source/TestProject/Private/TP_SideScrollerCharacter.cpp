@@ -53,6 +53,60 @@ ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+ATP_WeaponBase* ATP_SideScrollerCharacter::GetCurrentWeapon() const
+{
+	return CurrentWeapon;
+}
+
+void ATP_SideScrollerCharacter::NextWeapon()
+{
+	if (Weapons.Num() < 2)
+	{
+		return;
+	}
+
+	int32 CurrentWeaponIndex = Weapons.Find(CurrentWeapon);
+	CurrentWeapon->Unequip();
+
+	if (CurrentWeaponIndex == INDEX_NONE)
+	{
+		CurrentWeapon=Weapons[0];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+	else
+	{
+		CurrentWeapon=Weapons[(CurrentWeaponIndex + 1) % Weapons.Num()];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+}
+
+void ATP_SideScrollerCharacter::PreviousWeapon()
+{
+	if (Weapons.Num() < 2)
+	{
+		return;
+	}
+
+	int32 CurrentWeaponIndex = Weapons.Find(CurrentWeapon);
+	CurrentWeapon->Unequip();
+
+	if (CurrentWeaponIndex == INDEX_NONE)
+	{
+		CurrentWeapon=Weapons[0];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+	else
+	{
+		int32 IndexOfPrevWeapon = FMath::Abs(CurrentWeaponIndex - 1 + Weapons.Num()) % Weapons.Num();
+		CurrentWeapon=Weapons[IndexOfPrevWeapon];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+}
+
 UAbilitySystemComponent* ATP_SideScrollerCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystem;
@@ -72,17 +126,7 @@ void ATP_SideScrollerCharacter::BeginPlay()
 
 	}
 
-	//TODO: This isn't working, probably
-	if (CurrentWeaponClass) {
-		FVector Location(0.0f, 0.0f, 0.0f);
-		FRotator Rotation(0.0f, 0.0f, 0.0f);
-		FActorSpawnParameters SpawnInfo;
-
-		CurrentWeapon = GetWorld()->SpawnActor<ATP_WeaponBase>(CurrentWeaponClass, Location, Rotation, SpawnInfo);
-
-		CurrentWeapon->SetOwningCharacter(this);
-		CurrentWeapon->AddAbilities();
-	}
+	InitializeWeapons();
 	
 }
 
@@ -150,3 +194,25 @@ FName ATP_SideScrollerCharacter::GetWeaponAttachPoint()
 {
 	return WeaponAttachPoint;
 }
+
+void ATP_SideScrollerCharacter::InitializeWeapons()
+{
+	for (TSubclassOf<ATP_WeaponBase>& WeaponClass: WeaponClasses)
+	{
+		FVector Location(0.0f, 0.0f, 0.0f);
+		FRotator Rotation(0.0f, 0.0f, 0.0f);
+		FActorSpawnParameters SpawnInfo;
+
+		ATP_WeaponBase* ThisWeapon = GetWorld()->SpawnActor<ATP_WeaponBase>(WeaponClass, Location, Rotation, SpawnInfo);
+		Weapons.Add(ThisWeapon);
+		ThisWeapon->SetOwningCharacter(this);
+
+		if(ThisWeapon->WeaponTag == CurrentWeaponTag)
+		{
+			CurrentWeapon = ThisWeapon;
+			CurrentWeapon->Equip();
+		}
+		
+	}
+}
+

@@ -34,6 +34,9 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 
 protected:
 
+	UPROPERTY()
+	ATP_WeaponBase* CurrentWeapon;
+
 	virtual void BeginPlay() override;
 
 
@@ -49,10 +52,22 @@ public:
 		FName WeaponAttachPoint;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon")
-		TSubclassOf <class ATP_WeaponBase> CurrentWeaponClass;
+		TArray<TSubclassOf <class ATP_WeaponBase>> WeaponClasses;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon")
-		ATP_WeaponBase* CurrentWeapon;
+	UPROPERTY()
+	TArray<ATP_WeaponBase*> Weapons;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon")
+	FGameplayTag CurrentWeaponTag;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    ATP_WeaponBase* GetCurrentWeapon() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual void NextWeapon();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual void PreviousWeapon();
 
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -70,6 +85,8 @@ public:
 		TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
 
 	virtual void AddStartupEffects();
+
+	virtual void InitializeWeapons();
 
 	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
 	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)

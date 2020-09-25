@@ -20,6 +20,9 @@ public:
 	// Sets default values for this actor's properties
 	ATP_WeaponBase();
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
+	FGameplayTag WeaponTag;
+
 	// Implement IAbilitySystemInterface
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -31,6 +34,8 @@ public:
 
 	// Called when the player equips this weapon
 	virtual void Equip();
+
+	virtual void Unequip();
 
 protected:
 	UPROPERTY()

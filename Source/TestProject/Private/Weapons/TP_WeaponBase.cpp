@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AbilitySystemComponent.h"
 #include "Weapons/TP_WeaponBase.h"
+#include "AbilitySystemComponent.h"
+
 
 // Sets default values
 ATP_WeaponBase::ATP_WeaponBase()
@@ -30,8 +31,8 @@ void ATP_WeaponBase::SetOwningCharacter(ATP_SideScrollerCharacter* InOwningChara
 		// Called when added to inventory
 		AbilitySystemComponent = Cast<UAbilitySystemComponent>(OwningCharacter->GetAbilitySystemComponent());
 		SetOwner(InOwningCharacter);
-		FName AttachPoint = OwningCharacter->GetWeaponAttachPoint();
-		WeaponMesh->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
+		//FName AttachPoint = OwningCharacter->GetWeaponAttachPoint();
+		//WeaponMesh->AttachToComponent(OwningCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 		//AttachToComponent(OwningCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		
 	}
@@ -103,6 +104,24 @@ void ATP_WeaponBase::Equip()
 		WeaponMesh->SetVisibility(true, true);
 	}
 
+	AddAbilities();
+
+}
+
+void ATP_WeaponBase::Unequip()
+{
+	if (OwningCharacter == nullptr)
+	{
+		return;
+	}
+
+	WeaponMesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	WeaponMesh->CastShadow = false;
+	WeaponMesh->bCastHiddenShadow = false;
+	WeaponMesh->SetVisibility(true, true); // Without this, the unequipped weapon's 3p shadow hangs around
+	WeaponMesh->SetVisibility(false, true);
+
+	RemoveAbilities();
 }
 
 // Called when the game starts or when spawned
