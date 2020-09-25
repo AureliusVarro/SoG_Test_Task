@@ -11,6 +11,8 @@
 #include "../TestProject.h"
 #include "TP_SideScrollerCharacter.generated.h"
 
+class ATP_WeaponBase;
+
 UCLASS(config=Game)
 class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -32,7 +34,11 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 
 protected:
 
+	UPROPERTY()
+	ATP_WeaponBase* CurrentWeapon;
+
 	virtual void BeginPlay() override;
+
 
 public:
 
@@ -41,6 +47,27 @@ public:
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 		TArray<TSubclassOf<class UTP_GameplayAbility>> CharacterAbilities;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon")
+		FName WeaponAttachPoint;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon")
+		TArray<TSubclassOf <class ATP_WeaponBase>> WeaponClasses;
+
+	UPROPERTY()
+	TArray<ATP_WeaponBase*> Weapons;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon")
+	FGameplayTag CurrentWeaponTag;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    ATP_WeaponBase* GetCurrentWeapon() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual void NextWeapon();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+    virtual void PreviousWeapon();
 
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -59,9 +86,13 @@ public:
 
 	virtual void AddStartupEffects();
 
+	virtual void InitializeWeapons();
+
 	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
 	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
 	void AddCharacterAbilities();
+
+	FName GetWeaponAttachPoint();
 
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
