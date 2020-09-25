@@ -39,6 +39,9 @@ ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 	//AttributeSet
 	AttributeSet = CreateDefaultSubobject<UTP_AttributeSet>(TEXT("AttributeSet"));
 
+	//AmmoAttributeSet
+	AmmoAttributeSet = CreateDefaultSubobject<UTP_AmmoAttributeSet>(TEXT("AmmoAttributeSet"));
+
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
