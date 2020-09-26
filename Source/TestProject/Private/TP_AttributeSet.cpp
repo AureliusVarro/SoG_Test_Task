@@ -21,7 +21,7 @@ void UTP_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 	{
 		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
 	}
-	if(Attribute == GetMaxArmorAttribute())
+	else if(Attribute == GetMaxArmorAttribute())
 	{
 		AdjustAttributeForMaxChange(Armor, MaxArmor, NewValue, GetArmorAttribute());
 	}
@@ -39,6 +39,11 @@ void UTP_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	{
 		// Handle health changes.
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetArmorAttribute())
+	{
+		// Handle armor changes.
+		SetArmor(FMath::Clamp(GetArmor(), 0.0f, GetMaxArmor()));
 	}
 	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
