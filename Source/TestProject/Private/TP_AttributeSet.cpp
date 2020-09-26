@@ -38,7 +38,7 @@ void UTP_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		// Handle health changes.
-		SetStamina(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
 	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
