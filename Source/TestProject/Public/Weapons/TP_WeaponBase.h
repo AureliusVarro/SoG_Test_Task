@@ -23,6 +23,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
 	FGameplayTag WeaponTag;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
+	FName MuzzleSocket;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
+	float HipSpreadAngle;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
+	float AimSpreadAngle;
+	
 	// Implement IAbilitySystemInterface
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -36,6 +45,9 @@ public:
 	virtual void Equip();
 
 	virtual void Unequip();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Weapon")
+    virtual USkeletalMeshComponent* GetMesh() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
     virtual int32 GetClipAmmo() const;
