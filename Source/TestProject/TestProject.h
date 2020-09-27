@@ -13,6 +13,7 @@ enum class ETP_AbilityInputID : uint8
 	Pickup			UMETA(DisplayName = "Pickup"),	// This will be bound via key bindings in engine as "Pickup"
 	JumpAbility		UMETA(DisplayName = "JumpAbility"),
 	Sprint			UMETA(DisplayName = "Sprint"),
-	Fire			UMETA(DisplayName = "Fire")
+	Fire			UMETA(DisplayName = "Fire"),
+	Reload			UMETA(DisplayName = "Reload")
 };
 
