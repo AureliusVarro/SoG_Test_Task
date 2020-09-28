@@ -127,10 +127,25 @@ void ATP_SideScrollerCharacter::BeginPlay()
 		InitializeAttributes();
 		AddStartupEffects();
 
+		// Attribute change callbacks
+		HealthChangedDelegateHandle = AbilitySystem->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_SideScrollerCharacter::HealthChanged);
 	}
 
 	InitializeWeapons();
 	
+}
+
+void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data)
+{
+	/*UE_LOG(LogTemp, Warning, TEXT("Health changed"));*/
+
+	// If the player died, handle death
+	if (!IsAlive())
+	{
+		//TODO: Add death logic here
+
+		/*UE_LOG(LogTemp, Warning, TEXT("Player dies"));*/
+	}
 }
 
 void ATP_SideScrollerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -154,9 +169,15 @@ void ATP_SideScrollerCharacter::InitializeAttributes()
 	}
 }
 
+bool ATP_SideScrollerCharacter::IsAlive() const
+{
+	return AttributeSet->GetHealth() > 0.0f;
+}
+
 void ATP_SideScrollerCharacter::AddStartupEffects()
 {
-	if (!AbilitySystem) {
+	if (!AbilitySystem)
+	{
 		return;
 	}
 
