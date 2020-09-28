@@ -9,6 +9,10 @@
 #include "TP_AttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+void ATP_SideScrollerCharacter::PlayerDeath_Implementation()
+{
+}
+
 ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 {
 	// Set size for collision capsule
@@ -127,11 +131,18 @@ void ATP_SideScrollerCharacter::BeginPlay()
 		InitializeAttributes();
 		AddStartupEffects();
 
+		AbilitySystem->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_SideScrollerCharacter::HealthChanged);
+
 	}
 
 	InitializeWeapons();
 	
 }
+void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data) {
+	if (Data.NewValue <= 0)
+		PlayerDeath();
+}
+
 
 void ATP_SideScrollerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
