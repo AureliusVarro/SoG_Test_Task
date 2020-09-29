@@ -143,8 +143,9 @@ void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data
 	if (!IsAlive())
 	{
 		//TODO: Add death logic here
+		OnDeathDelegate.Broadcast();
 
-		/*UE_LOG(LogTemp, Warning, TEXT("Player dies"));*/
+		UE_LOG(LogTemp, Warning, TEXT("Player dies"));
 	}
 }
 
