@@ -12,26 +12,13 @@ struct TP_DamageStatics
 	//and HealthDef(which is a FGameplayEffectAttributeCaptureDefinition).
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
-	//DECLARE_ATTRIBUTE_CAPTUREDEF(Damage);
-
-	//DECLARE_ATTRIBUTE_CAPTUREDEF(AttackMultiplier); //Here AttackMultiplierProperty and AttackMultiplierDef. I hope you get the drill.
-	//DECLARE_ATTRIBUTE_CAPTUREDEF(DefenseMultiplier);
-	//DECLARE_ATTRIBUTE_CAPTUREDEF(BaseAttackPower);
 
 	TP_DamageStatics()
 	{
 		// We define the values of the variables we declared now. In this example, HealthProperty will point to the Health attribute in the UMyAttributeSet on the receiving target of this execution. The last parameter is a bool, and determines if we snapshot the attribute's value at the time of definition.
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UTP_AttributeSet, Health, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UTP_AttributeSet, Armor, Target, false);
-		//DEFINE_ATTRIBUTE_CAPTUREDEF(UTP_AttributeSet, Damage, Source, false);
 
-		//This here is a different example: We still take the attribute from UMyAttributeSet, but this time it is BaseAttackPower, and we look at the effect's source for it. We also want to snapshot is because the effect's strength should be determined during its initial creation. A projectile wouldn't change
-		//damage values depending on the source's stat changes halfway through flight, after all.
-		//DEFINE_ATTRIBUTE_CAPTUREDEF(UTP_AttributeSet, BaseAttackPower, Source, true);
-
-		//The same rules apply for the multiplier attributes too.
-		//DEFINE_ATTRIBUTE_CAPTUREDEF(UTP_AttributeSet, AttackMultiplier, Source, true);
-		//DEFINE_ATTRIBUTE_CAPTUREDEF(UTP_AttributeSet, DefenseMultiplier, Target, false);
 	}
 };
 
@@ -50,9 +37,6 @@ UTP_DamagetExecCalculation::UTP_DamagetExecCalculation()
 
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
 	InvalidScopedModifierAttributes.Add(DamageStatics().ArmorDef);
-
-	//RelevantAttributesToCapture.Add(DamageStatics().DamageDef);
-	//InvalidScopedModifierAttributes.Add(DamageStatics().DamageDef);
 
 }
 
@@ -78,7 +62,6 @@ void UTP_DamagetExecCalculation::Execute_Implementation(const FGameplayEffectCus
 	FAggregatorEvaluateParameters EvaluationParameters;
 	//EvaluationParameters.SourceTags = SourceTags;
 	//EvaluationParameters.TargetTags = TargetTags;
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("World delta for current frame equals %s"), *EvaluationParameters.SourceTags->ToString()));
 
 	float Health = 0.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().HealthDef, EvaluationParameters, Health);
@@ -96,24 +79,12 @@ void UTP_DamagetExecCalculation::Execute_Implementation(const FGameplayEffectCus
 	//EvaluationParameters чуть выше нас
 	//а Damage - это переменна€, в которую мы поместим полученное значение (переменна€ Damage, которую мы только что объ€вили)
 	//ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);
-
-	// Add SetByCaller damage if it exists
-	// јттрибут damage по умолчанию = 0, damage устанавливаетс€ в абилках с помощью SetByCallerMagnitude  
 	Damage += FMath::Max<float>(Spec.GetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), false, -1.0f), 0.0f);
 
 	float UnmitigatedDamage = Damage; // Can multiply any damage boosters here
 	float OldArmor = Armor;
 	Armor = FMath::Clamp (Armor-Damage,0.0f, Armor);
 	float MitigatedDamage = UnmitigatedDamage - (OldArmor - Armor) * 0.5f;
-	
-
-
-
-
-
-	
-	
-
 
 	if (MitigatedDamage > 0.f)
 	{
