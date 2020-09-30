@@ -22,7 +22,7 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 	GENERATED_BODY()
 	
 
-		virtual void HealthChanged(const FOnAttributeChangeData& Data);
+		//virtual void HealthChanged(const FOnAttributeChangeData& Data);
 
 	
 	/** Side view camera */
