@@ -78,6 +78,7 @@ void UTP_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, StaminaRegenRate, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, Damage, COND_None, REPNOTIFY_Always);
 }
 
 void UTP_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
@@ -118,4 +119,9 @@ void UTP_AttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStam
 void UTP_AttributeSet::OnRep_StaminaRegenRate(const FGameplayAttributeData& OldStaminaRegenRate)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, StaminaRegenRate, OldStaminaRegenRate);
+}
+
+void UTP_AttributeSet::OnRep_Damage(const FGameplayAttributeData& OldDamage)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, Damage, OldDamage);
 }

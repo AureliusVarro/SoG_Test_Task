@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "AttributeSet.h"
+#include "TP_AttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "TP_EnemyAttributeSet.h"
 #include "TP_EnemyCharacterBase.generated.h"
 
 UCLASS()
@@ -34,8 +36,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities, meta = (AllowPrivateAccess = "true"))
 		class UAbilitySystemComponent* AbilitySystemComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities | Attributes")  //, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf <class UAttributeSet> AttributeSet;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
+		class UTP_AttributeSet* AttributeSet;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 		TArray<TSubclassOf<class UGameplayAbility>> EnemyAbilities;
