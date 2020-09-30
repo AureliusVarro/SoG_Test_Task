@@ -50,6 +50,11 @@ void UTP_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 		// Handle stamina changes.
 		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
 	}
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	{
+		// Handle stamina changes.
+		SetMovementSpeed(FMath::Clamp(GetMovementSpeed(), 0.0f, 1500.0f));
+	}
 }
 
 void UTP_AttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
@@ -118,4 +123,9 @@ void UTP_AttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStam
 void UTP_AttributeSet::OnRep_StaminaRegenRate(const FGameplayAttributeData& OldStaminaRegenRate)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, StaminaRegenRate, OldStaminaRegenRate);
+}
+
+void UTP_AttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, MovementSpeed, OldMovementSpeed);
 }
