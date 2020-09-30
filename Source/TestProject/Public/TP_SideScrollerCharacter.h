@@ -28,10 +28,10 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities, meta = (AllowPrivateAccess = "true"))
-		class UAbilitySystemComponent* AbilitySystem;
+	class UAbilitySystemComponent* AbilitySystem;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
-		class UTP_AttributeSet* AttributeSet;
+	class UTP_AttributeSet* AttributeSet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
 	class UTP_AmmoAttributeSet* AmmoAttributeSet;
@@ -41,7 +41,12 @@ protected:
 	UPROPERTY()
 	ATP_WeaponBase* CurrentWeapon;
 
+	FDelegateHandle HealthChangedDelegateHandle;
+
 	virtual void BeginPlay() override;
+
+	// Attribute changed callbacks
+	virtual void HealthChanged(const FOnAttributeChangeData& Data);
 
 
 public:
@@ -50,13 +55,13 @@ public:
 
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-		TArray<TSubclassOf<class UTP_GameplayAbility>> CharacterAbilities;
+	TArray<TSubclassOf<class UTP_GameplayAbility>> CharacterAbilities;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon")
-		FName WeaponAttachPoint;
+	FName WeaponAttachPoint;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon")
-		TArray<TSubclassOf <class ATP_WeaponBase>> WeaponClasses;
+	TArray<TSubclassOf <class ATP_WeaponBase>> WeaponClasses;
 
 	UPROPERTY()
 	TArray<ATP_WeaponBase*> Weapons;
@@ -80,13 +85,16 @@ public:
 
 	virtual void InitializeAttributes();
 
+	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDPlayerState")
+	bool IsAlive() const;
+
 	//Effect to setup the default attributes
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities | Attributes")
-		TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
+	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
 
 	// These effects are only applied one time on startup
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-		TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
 
 	virtual void AddStartupEffects();
 
