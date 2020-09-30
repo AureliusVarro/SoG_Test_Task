@@ -23,6 +23,7 @@ class TESTPROJECT_API UTP_EnemyAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 	
 public:
+	UTP_EnemyAttributeSet();
 
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 		FGameplayAttributeData Damage;
