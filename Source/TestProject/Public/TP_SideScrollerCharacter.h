@@ -14,6 +14,8 @@
 
 class ATP_WeaponBase;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathDelegate);
+
 UCLASS(config=Game)
 class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -53,8 +55,11 @@ public:
 
 	ATP_SideScrollerCharacter();
 
+	UPROPERTY(BlueprintAssignable, Category = "Abilities | Attributes")
+	FOnDeathDelegate OnDeathDelegate;
+
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
 	TArray<TSubclassOf<class UTP_GameplayAbility>> CharacterAbilities;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon")
@@ -85,7 +90,7 @@ public:
 
 	virtual void InitializeAttributes();
 
-	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDPlayerState")
+	UFUNCTION(BlueprintCallable, Category = "Abilities | Attributes")
 	bool IsAlive() const;
 
 	//Effect to setup the default attributes
@@ -93,7 +98,7 @@ public:
 	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
 
 	// These effects are only applied one time on startup
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
 	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
 
 	virtual void AddStartupEffects();
