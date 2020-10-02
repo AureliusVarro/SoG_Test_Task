@@ -64,13 +64,16 @@ public:
 		UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_MaxStamina)
 		FGameplayAttributeData MaxStamina;
 	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, MaxStamina)
+	
+	// Stamina regen rate will passively increase Stamina every second
+    	UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_StaminaRegenRate)
+    	FGameplayAttributeData StaminaRegenRate;
+    ATTRIBUTE_ACCESSORS(UTP_AttributeSet, StaminaRegenRate)
 
-		// Stamina regen rate will passively increase Stamina every second
-		UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_StaminaRegenRate)
-		FGameplayAttributeData StaminaRegenRate;
-	ATTRIBUTE_ACCESSORS(UTP_AttributeSet, StaminaRegenRate)
-
-protected:
+// Stamina regen rate will passively increase Stamina every second
+    	UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_MovementSpeed)
+    	FGameplayAttributeData MovementSpeed;
+    ATTRIBUTE_ACCESSORS(UTP_AttributeSet, MovementSpeed)
 
 	// Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes.
 	// (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before)
@@ -100,4 +103,6 @@ protected:
 	UFUNCTION()
 		virtual void OnRep_StaminaRegenRate(const FGameplayAttributeData& OldStaminaRegenRate);
 
+	UFUNCTION()
+        virtual void OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed);
 };
