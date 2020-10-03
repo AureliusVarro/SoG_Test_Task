@@ -24,6 +24,9 @@ public:
 	FGameplayTag WeaponTag;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
+	FGameplayTag AmmoDataTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
 	FName MuzzleSocket;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Weapon")
