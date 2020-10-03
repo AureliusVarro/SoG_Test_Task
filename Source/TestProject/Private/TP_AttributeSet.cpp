@@ -21,7 +21,7 @@ void UTP_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 	{
 		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
 	}
-	if(Attribute == GetMaxArmorAttribute())
+	else if(Attribute == GetMaxArmorAttribute())
 	{
 		AdjustAttributeForMaxChange(Armor, MaxArmor, NewValue, GetArmorAttribute());
 	}
@@ -38,12 +38,22 @@ void UTP_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		// Handle health changes.
-		SetStamina(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetArmorAttribute())
+	{
+		// Handle armor changes.
+		SetArmor(FMath::Clamp(GetArmor(), 0.0f, GetMaxArmor()));
 	}
 	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
 		// Handle stamina changes.
 		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	{
+		// Handle stamina changes.
+		SetMovementSpeed(FMath::Clamp(GetMovementSpeed(), 0.0f, 1500.0f));
 	}
 }
 
@@ -73,6 +83,7 @@ void UTP_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTP_AttributeSet, StaminaRegenRate, COND_None, REPNOTIFY_Always);
+	
 }
 
 void UTP_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
@@ -113,4 +124,9 @@ void UTP_AttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStam
 void UTP_AttributeSet::OnRep_StaminaRegenRate(const FGameplayAttributeData& OldStaminaRegenRate)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, StaminaRegenRate, OldStaminaRegenRate);
+}
+
+void UTP_AttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTP_AttributeSet, MovementSpeed, OldMovementSpeed);
 }

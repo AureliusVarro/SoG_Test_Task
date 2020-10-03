@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Weapons/TP_WeaponBase.h"
 #include "TP_AttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -38,6 +39,9 @@ ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 	//AttributeSet
 	AttributeSet = CreateDefaultSubobject<UTP_AttributeSet>(TEXT("AttributeSet"));
 
+	//AmmoAttributeSet
+	AmmoAttributeSet = CreateDefaultSubobject<UTP_AmmoAttributeSet>(TEXT("AmmoAttributeSet"));
+
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
@@ -50,6 +54,60 @@ ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+}
+
+ATP_WeaponBase* ATP_SideScrollerCharacter::GetCurrentWeapon() const
+{
+	return CurrentWeapon;
+}
+
+void ATP_SideScrollerCharacter::NextWeapon()
+{
+	if (Weapons.Num() < 2)
+	{
+		return;
+	}
+
+	int32 CurrentWeaponIndex = Weapons.Find(CurrentWeapon);
+	CurrentWeapon->Unequip();
+
+	if (CurrentWeaponIndex == INDEX_NONE)
+	{
+		CurrentWeapon=Weapons[0];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+	else
+	{
+		CurrentWeapon=Weapons[(CurrentWeaponIndex + 1) % Weapons.Num()];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+}
+
+void ATP_SideScrollerCharacter::PreviousWeapon()
+{
+	if (Weapons.Num() < 2)
+	{
+		return;
+	}
+
+	int32 CurrentWeaponIndex = Weapons.Find(CurrentWeapon);
+	CurrentWeapon->Unequip();
+
+	if (CurrentWeaponIndex == INDEX_NONE)
+	{
+		CurrentWeapon=Weapons[0];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
+	else
+	{
+		int32 IndexOfPrevWeapon = FMath::Abs(CurrentWeaponIndex - 1 + Weapons.Num()) % Weapons.Num();
+		CurrentWeapon=Weapons[IndexOfPrevWeapon];
+		CurrentWeaponTag = CurrentWeapon->WeaponTag;
+		CurrentWeapon->Equip();
+	}
 }
 
 UAbilitySystemComponent* ATP_SideScrollerCharacter::GetAbilitySystemComponent() const
@@ -69,6 +127,25 @@ void ATP_SideScrollerCharacter::BeginPlay()
 		InitializeAttributes();
 		AddStartupEffects();
 
+		// Attribute change callbacks
+		HealthChangedDelegateHandle = AbilitySystem->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_SideScrollerCharacter::HealthChanged);
+	}
+
+	InitializeWeapons();
+	
+}
+
+void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data)
+{
+	/*UE_LOG(LogTemp, Warning, TEXT("Health changed"));*/
+
+	// If the player died, handle death
+	if (!IsAlive())
+	{
+		//TODO: Add death logic here
+		OnDeathDelegate.Broadcast();
+
+		UE_LOG(LogTemp, Warning, TEXT("Player dies"));
 	}
 }
 
@@ -93,9 +170,15 @@ void ATP_SideScrollerCharacter::InitializeAttributes()
 	}
 }
 
+bool ATP_SideScrollerCharacter::IsAlive() const
+{
+	return AttributeSet->GetHealth() > 0.0f;
+}
+
 void ATP_SideScrollerCharacter::AddStartupEffects()
 {
-	if (!AbilitySystem) {
+	if (!AbilitySystem)
+	{
 		return;
 	}
 
@@ -131,3 +214,30 @@ bool ATP_SideScrollerCharacter::AddCharacterAbilities_Validate()
 {
 	return true;
 }
+
+FName ATP_SideScrollerCharacter::GetWeaponAttachPoint()
+{
+	return WeaponAttachPoint;
+}
+
+void ATP_SideScrollerCharacter::InitializeWeapons()
+{
+	for (TSubclassOf<ATP_WeaponBase>& WeaponClass: WeaponClasses)
+	{
+		FVector Location(0.0f, 0.0f, 0.0f);
+		FRotator Rotation(0.0f, 0.0f, 0.0f);
+		FActorSpawnParameters SpawnInfo;
+
+		ATP_WeaponBase* ThisWeapon = GetWorld()->SpawnActor<ATP_WeaponBase>(WeaponClass, Location, Rotation, SpawnInfo);
+		Weapons.Add(ThisWeapon);
+		ThisWeapon->SetOwningCharacter(this);
+
+		if(ThisWeapon->WeaponTag == CurrentWeaponTag)
+		{
+			CurrentWeapon = ThisWeapon;
+			CurrentWeapon->Equip();
+		}
+		
+	}
+}
+
