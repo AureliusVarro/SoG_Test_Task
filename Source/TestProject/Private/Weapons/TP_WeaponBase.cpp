@@ -124,6 +124,11 @@ void ATP_WeaponBase::Unequip()
 	RemoveAbilities();
 }
 
+USkeletalMeshComponent* ATP_WeaponBase::GetMesh() const
+{
+	return WeaponMesh;
+}
+
 int32 ATP_WeaponBase::GetClipAmmo() const
 {
 	return ClipAmmo;
@@ -148,6 +153,6 @@ void ATP_WeaponBase::SetMaxClipAmmo(int32 NewMaxClipAmmo)
 void ATP_WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ClipAmmo = MaxClipAmmo;	
 }
 
