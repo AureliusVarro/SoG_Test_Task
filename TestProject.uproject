@@ -18,10 +18,7 @@
 			"Name": "GameplayAbilities",
 			"Enabled": true
 		},
-		{
-			"Name": "HoudiniEngine",
-			"Enabled": true
-		},
+		
 		{
 			"Name": "SteamVR",
 			"Enabled": false,
