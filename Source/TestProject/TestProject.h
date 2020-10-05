@@ -14,6 +14,7 @@ enum class ETP_AbilityInputID : uint8
 	JumpAbility		UMETA(DisplayName = "JumpAbility"),
 	Sprint			UMETA(DisplayName = "Sprint"),
 	Fire			UMETA(DisplayName = "Fire"),
-	Reload			UMETA(DisplayName = "Reload")
+	Reload			UMETA(DisplayName = "Reload"),
+	Aim				UMETA(DisplayName = "Aim")
 };
 
