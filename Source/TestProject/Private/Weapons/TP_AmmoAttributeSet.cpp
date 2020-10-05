@@ -16,7 +16,7 @@ void UTP_AmmoAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCal
         SetShotgunAmmo(FMath::Clamp(GetShotgunAmmo(), 0.0f, GetMaxShotgunAmmo()));
     }
 
-    if (Data.EvaluatedData.Attribute == GetShotgunAmmoAttribute())
+    if (Data.EvaluatedData.Attribute == GetPistolAmmoAttribute())
     {
         // Handle stamina changes.
         SetPistolAmmo(FMath::Clamp(GetPistolAmmo(), 0.0f, GetMaxPistolAmmo()));

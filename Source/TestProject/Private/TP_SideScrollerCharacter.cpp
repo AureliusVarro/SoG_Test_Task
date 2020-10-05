@@ -134,6 +134,7 @@ void ATP_SideScrollerCharacter::BeginPlay()
 	InitializeWeapons();
 	
 }
+<<<<<<< HEAD
 
 void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data)
 {
@@ -147,6 +148,11 @@ void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data
 
 		UE_LOG(LogTemp, Warning, TEXT("Player dies"));
 	}
+=======
+void ATP_SideScrollerCharacter::HealthChanged(const FOnAttributeChangeData& Data) {
+	if (Data.NewValue <= 0)
+		PlayerDeath();
+>>>>>>> team2_dev
 }
 
 void ATP_SideScrollerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

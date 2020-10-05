@@ -21,6 +21,12 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 {
 	GENERATED_BODY()
 
+<<<<<<< HEAD
+=======
+		//virtual void HealthChanged(const FOnAttributeChangeData& Data);
+
+	
+>>>>>>> team2_dev
 	/** Side view camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* SideViewCameraComponent;
