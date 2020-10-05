@@ -20,7 +20,11 @@ UCLASS(config=Game)
 class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
+	
 
+		//virtual void HealthChanged(const FOnAttributeChangeData& Data);
+
+	
 	/** Side view camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* SideViewCameraComponent;
@@ -52,7 +56,9 @@ protected:
 
 
 public:
-
+	UFUNCTION(BlueprintNativeEvent)
+		void PlayerDeath();
+	virtual void PlayerDeath_Implementation();
 	ATP_SideScrollerCharacter();
 
 	UPROPERTY(BlueprintAssignable, Category = "Abilities | Attributes")
