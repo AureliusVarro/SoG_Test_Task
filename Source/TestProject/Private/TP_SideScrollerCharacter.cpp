@@ -11,6 +11,7 @@
 
 void ATP_SideScrollerCharacter::PlayerDeath_Implementation()
 {
+	
 }
 
 ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
