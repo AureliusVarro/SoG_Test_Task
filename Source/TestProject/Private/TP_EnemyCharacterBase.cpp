@@ -2,6 +2,7 @@
 
 
 #include "TP_EnemyCharacterBase.h"
+#include "..\Public\TP_EnemyCharacterBase.h"
 
 // Sets default values
 ATP_EnemyCharacterBase::ATP_EnemyCharacterBase()
@@ -13,6 +14,8 @@ ATP_EnemyCharacterBase::ATP_EnemyCharacterBase()
 	//AttributeSet = CreateDefaultSubobject<UTP_EnemyAttributeSet>(TEXT("AttributeSet"));
 	
 }
+
+
 
 // Called when the game starts or when spawned
 void ATP_EnemyCharacterBase::BeginPlay()
@@ -27,12 +30,28 @@ void ATP_EnemyCharacterBase::BeginPlay()
 		InitializeAttributes();
 		AddStartupEffects();
 
+		// Attribute change callbacks
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_EnemyCharacterBase::HealthChanged);
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("World delta for current frame equals %f"), AttributeSet->Health.GetBaseValue()));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("World delta for current frame equals %f"), AttributeSet->Health.GetBaseValue()));
 	
 	
 }
 
+void ATP_EnemyCharacterBase::Death_Implementation()
+{
+	OnEnemyDeathDelegate.Broadcast();
+	
+	
+}
+
+void ATP_EnemyCharacterBase::HealthChanged(const FOnAttributeChangeData & Data)
+{
+
+	if (Data.NewValue <= 0)
+		Death();
+
+}
 // Called every frame
 void ATP_EnemyCharacterBase::Tick(float DeltaTime)
 {

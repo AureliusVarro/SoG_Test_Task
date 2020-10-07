@@ -9,7 +9,10 @@
 #include "TP_AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "TP_EnemyAttributeSet.h"
+#include "../TestProject.h"
 #include "TP_EnemyCharacterBase.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnemyDeathDelegate);
 
 UCLASS()
 class TESTPROJECT_API ATP_EnemyCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -19,6 +22,20 @@ class TESTPROJECT_API ATP_EnemyCharacterBase : public ACharacter, public IAbilit
 public:
 	// Sets default values for this character's properties
 	ATP_EnemyCharacterBase();
+
+	UPROPERTY(BlueprintAssignable, Category = "Abilities | Attributes")
+		FOnEnemyDeathDelegate OnEnemyDeathDelegate;
+
+	UFUNCTION(BlueprintNativeEvent)
+		void Death();
+
+	virtual void Death_Implementation();
+
+	// Attribute changed callbacks
+	virtual void HealthChanged(const FOnAttributeChangeData& Data);
+
+
+
 
 protected:
 	// Called when the game starts or when spawned
