@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "TP_GameplayAbility.h"
-#include "TP_AttributeSet.h"
 #include "Weapons/TP_AmmoAttributeSet.h"
 #include "../TestProject.h"
+#include "Characters/TP_CharacterBase.h"
+
 #include "TP_SideScrollerCharacter.generated.h"
 
 class ATP_WeaponBase;
 
 UCLASS(config=Game)
-class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterface
+class ATP_SideScrollerCharacter : public ATP_CharacterBase
 {
 	GENERATED_BODY()
 	
@@ -30,12 +30,6 @@ class ATP_SideScrollerCharacter : public ACharacter, public IAbilitySystemInterf
 	/** Camera boom positioning the camera beside the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities, meta = (AllowPrivateAccess = "true"))
-	class UAbilitySystemComponent* AbilitySystem;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
-	class UTP_AttributeSet* AttributeSet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
 	class UTP_AmmoAttributeSet* AmmoAttributeSet;
@@ -54,10 +48,11 @@ protected:
 
 
 public:
+	ATP_SideScrollerCharacter();
+	
 	UFUNCTION(BlueprintNativeEvent)
 		void PlayerDeath();
 	virtual void PlayerDeath_Implementation();
-	ATP_SideScrollerCharacter();
 
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
@@ -84,19 +79,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
     virtual void PreviousWeapon();
 
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void InitializeAttributes();
-
 	UFUNCTION(BlueprintCallable, Category = "Abilities | Attributes")
 	bool IsAlive() const;
-
-	//Effect to setup the default attributes
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities | Attributes")
-	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
 
 	// These effects are only applied one time on startup
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")

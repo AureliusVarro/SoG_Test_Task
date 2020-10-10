@@ -38,12 +38,6 @@ ATP_SideScrollerCharacter::ATP_SideScrollerCharacter()
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	SideViewCameraComponent->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
 
-	//AbilitySystemComponent
-	AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
-
-	//AttributeSet
-	AttributeSet = CreateDefaultSubobject<UTP_AttributeSet>(TEXT("AttributeSet"));
-
 	//AmmoAttributeSet
 	AmmoAttributeSet = CreateDefaultSubobject<UTP_AmmoAttributeSet>(TEXT("AmmoAttributeSet"));
 
@@ -115,25 +109,19 @@ void ATP_SideScrollerCharacter::PreviousWeapon()
 	}
 }
 
-UAbilitySystemComponent* ATP_SideScrollerCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystem;
-}
-
 void ATP_SideScrollerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AbilitySystem->InitAbilityActorInfo(this, this);
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
-	if (AbilitySystem)
+	if (AbilitySystemComponent)
 	{
 		AddCharacterAbilities();
-		InitializeAttributes();
 		AddStartupEffects();
 
 		// Attribute change callbacks
-		HealthChangedDelegateHandle = AbilitySystem->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_SideScrollerCharacter::HealthChanged);
+		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_SideScrollerCharacter::HealthChanged);
 	}
 
 	InitializeWeapons();
@@ -148,21 +136,7 @@ void ATP_SideScrollerCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	AbilitySystem->BindAbilityActivationToInputComponent(InputComponent, FGameplayAbilityInputBinds("ConfirmInput", "CancelInput", "ETP_AbilityInputID"));
-}
-
-void ATP_SideScrollerCharacter::InitializeAttributes()
-{
-	if (AbilitySystem && AttributeSet) {
-		FGameplayEffectContextHandle EffectContext = AbilitySystem->MakeEffectContext();
-		EffectContext.AddSourceObject(this);
-		
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(DefaultAttributeEffect, 1, EffectContext);
-
-		if (SpecHandle.IsValid()) {
-			FActiveGameplayEffectHandle GEHandle = AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-		}
-	}
+	AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, FGameplayAbilityInputBinds("ConfirmInput", "CancelInput", "ETP_AbilityInputID"));
 }
 
 bool ATP_SideScrollerCharacter::IsAlive() const
@@ -172,20 +146,20 @@ bool ATP_SideScrollerCharacter::IsAlive() const
 
 void ATP_SideScrollerCharacter::AddStartupEffects()
 {
-	if (!AbilitySystem)
+	if (!AbilitySystemComponent)
 	{
 		return;
 	}
 
-	FGameplayEffectContextHandle EffectContext = AbilitySystem->MakeEffectContext();
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
 	for (TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
 	{
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
 		if (SpecHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle GEHandle = AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
 	}
 
@@ -194,11 +168,11 @@ void ATP_SideScrollerCharacter::AddStartupEffects()
 void ATP_SideScrollerCharacter::AddCharacterAbilities_Implementation()
 {
 	// Grant abilities, but only on the server	
-	if (IsValid(AbilitySystem))
+	if (IsValid(AbilitySystemComponent))
 	{
 		for (TSubclassOf<UTP_GameplayAbility>& StartupAbility : CharacterAbilities)
 		{
-			AbilitySystem->GiveAbility(
+			AbilitySystemComponent->GiveAbility(
 				FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->InputID), this));
 		}
 	}
