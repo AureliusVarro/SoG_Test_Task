@@ -8,7 +8,6 @@
 #include "AttributeSet.h"
 #include "TP_AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "TP_EnemyAttributeSet.h"
 #include "../TestProject.h"
 #include "TP_EnemyCharacterBase.generated.h"
 
@@ -40,6 +39,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	bool bIsDead;
 
 public:	
 	// Called every frame

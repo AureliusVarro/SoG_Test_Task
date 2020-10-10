@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "TP_EnemyCharacterBase.h"
 #include "TP_GameplayAbility.h"
-#include "AttributeSet.h"
 #include "TP_AttributeSet.h"
 #include "TP_EnemyAlpha.generated.h"
 
@@ -25,8 +24,5 @@ public:
 
 	//UPROPERTY()
 	//	class UAbilitySystemComponent* HardRefAbilitySystemComponent;
-
-	//UPROPERTY()
-	//	class UTP_EnemyAttributeSet* HardRefAttributeSet;
 
 };

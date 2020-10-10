@@ -10,8 +10,7 @@ ATP_EnemyCharacterBase::ATP_EnemyCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComponent=CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
-	//AttributeSet
-	//AttributeSet = CreateDefaultSubobject<UTP_EnemyAttributeSet>(TEXT("AttributeSet"));
+	bIsDead = false;
 	
 }
 
@@ -40,7 +39,11 @@ void ATP_EnemyCharacterBase::BeginPlay()
 
 void ATP_EnemyCharacterBase::Death_Implementation()
 {
-	OnEnemyDeathDelegate.Broadcast();
+	if(!bIsDead)
+	{
+		OnEnemyDeathDelegate.Broadcast();
+		bIsDead = true;
+	}
 	
 	
 }
