@@ -76,10 +76,9 @@ void ATP_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
 	if (AbilitySystemComponent)
 	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 		InitializeAttributes();
 		AddCharacterAbilities();
 		AddStartupEffects();

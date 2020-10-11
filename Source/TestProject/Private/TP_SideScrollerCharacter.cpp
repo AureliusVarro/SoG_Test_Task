@@ -113,8 +113,6 @@ void ATP_SideScrollerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
 	if (AbilitySystemComponent)
 	{
 		// Attribute change callbacks
