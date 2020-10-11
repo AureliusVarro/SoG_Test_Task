@@ -117,9 +117,6 @@ void ATP_SideScrollerCharacter::BeginPlay()
 
 	if (AbilitySystemComponent)
 	{
-		AddCharacterAbilities();
-		AddStartupEffects();
-
 		// Attribute change callbacks
 		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_SideScrollerCharacter::HealthChanged);
 	}
@@ -144,45 +141,6 @@ bool ATP_SideScrollerCharacter::IsAlive() const
 	return AttributeSet->GetHealth() > 0.0f;
 }
 
-void ATP_SideScrollerCharacter::AddStartupEffects()
-{
-	if (!AbilitySystemComponent)
-	{
-		return;
-	}
-
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	for (TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
-	{
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
-		if (SpecHandle.IsValid())
-		{
-			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-		}
-	}
-
-}
-
-void ATP_SideScrollerCharacter::AddCharacterAbilities_Implementation()
-{
-	// Grant abilities, but only on the server	
-	if (IsValid(AbilitySystemComponent))
-	{
-		for (TSubclassOf<UTP_GameplayAbility>& StartupAbility : CharacterAbilities)
-		{
-			AbilitySystemComponent->GiveAbility(
-				FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->InputID), this));
-		}
-	}
-
-}
-
-bool ATP_SideScrollerCharacter::AddCharacterAbilities_Validate()
-{
-	return true;
-}
 
 FName ATP_SideScrollerCharacter::GetWeaponAttachPoint()
 {

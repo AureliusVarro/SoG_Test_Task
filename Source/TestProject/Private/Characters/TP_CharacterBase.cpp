@@ -23,6 +23,19 @@ UAbilitySystemComponent* ATP_CharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void ATP_CharacterBase::AddCharacterAbilities()
+{
+	if (IsValid(AbilitySystemComponent))
+	{
+		for (TSubclassOf<UTP_GameplayAbility>& StartupAbility : CharacterAbilities)
+		{
+			AbilitySystemComponent->GiveAbility(
+                FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->InputID), this));
+		}
+	}
+
+}
+
 void ATP_CharacterBase::InitializeAttributes()
 {
 	if (AbilitySystemComponent && AttributeSet) {
@@ -37,6 +50,27 @@ void ATP_CharacterBase::InitializeAttributes()
 	}
 }
 
+void ATP_CharacterBase::AddStartupEffects()
+{
+	if (!AbilitySystemComponent)
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	for (TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+		if (SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+
+}
+
 // Called when the game starts or when spawned
 void ATP_CharacterBase::BeginPlay()
 {
@@ -47,6 +81,8 @@ void ATP_CharacterBase::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		InitializeAttributes();
+		AddCharacterAbilities();
+		AddStartupEffects();
 	}
 	
 }

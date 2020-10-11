@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemComponent.h"
-#include "TP_GameplayAbility.h"
 #include "Weapons/TP_AmmoAttributeSet.h"
 #include "../TestProject.h"
 #include "Characters/TP_CharacterBase.h"
@@ -54,10 +53,6 @@ public:
 		void PlayerDeath();
 	virtual void PlayerDeath_Implementation();
 
-	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
-	TArray<TSubclassOf<class UTP_GameplayAbility>> CharacterAbilities;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon")
 	FName WeaponAttachPoint;
 
@@ -85,17 +80,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities | Attributes")
 	bool IsAlive() const;
 
-	// These effects are only applied one time on startup
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
-	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
-
-	virtual void AddStartupEffects();
-
 	virtual void InitializeWeapons();
-
-	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
-	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
-	void AddCharacterAbilities();
 
 	FName GetWeaponAttachPoint();
 

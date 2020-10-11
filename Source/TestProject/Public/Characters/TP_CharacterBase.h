@@ -6,6 +6,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "TP_GameplayAbility.h"
 #include "TP_AttributeSet.h"
 #include "GameFramework/Character.h"
 #include "TP_CharacterBase.generated.h"
@@ -26,12 +27,25 @@ public:
 	class UTP_AttributeSet* AttributeSet;
 
 protected:
+	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
+	TArray<TSubclassOf<class UTP_GameplayAbility>> CharacterAbilities;
+
+	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
+	UFUNCTION(BlueprintCallable)
+    void AddCharacterAbilities();
 
 	//Effect to setup the default attributes
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities | Attributes")
 	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
 
 	virtual void InitializeAttributes();
+
+	// These effects are only applied one time on startup
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities | Startup")
+	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+
+	virtual void AddStartupEffects();
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
