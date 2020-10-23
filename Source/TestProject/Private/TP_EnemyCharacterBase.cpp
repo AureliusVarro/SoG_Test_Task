@@ -2,17 +2,24 @@
 
 
 #include "TP_EnemyCharacterBase.h"
+#include "GameplayEffect.h"
+#include "GameplayEffectExtension.h"
+//#include "Net/UnrealNetwork.h"
+#include "GameplayTagContainer.h"
+#include "..\Public\TP_EnemyCharacterBase.h"
 
-// Sets default values
+
 ATP_EnemyCharacterBase::ATP_EnemyCharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	AbilitySystemComponent=CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
-	//AttributeSet
-	//AttributeSet = CreateDefaultSubobject<UTP_EnemyAttributeSet>(TEXT("AttributeSet"));
+	//bIsDead = false;
+
+	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
 	
 }
+
+
 
 // Called when the game starts or when spawned
 void ATP_EnemyCharacterBase::BeginPlay()
@@ -21,18 +28,77 @@ void ATP_EnemyCharacterBase::BeginPlay()
 
 	
 
-	if (AbilitySystemComponent)
+	if (AbilitySystemComponent)//TODO: error
 	{
-		AddCharacterAbilities();
-		InitializeAttributes();
-		AddStartupEffects();
-
+	
+		// Called on server whenever a GE is applied to self. This includes instant and duration based GEs.
+		AbilitySystemComponent->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ATP_EnemyCharacterBase::OnGameplayEffectApplied);
+		// Attribute change callbacks
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute()).AddUObject(this, &ATP_EnemyCharacterBase::HealthChanged);
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("World delta for current frame equals %f"), AttributeSet->Health.GetBaseValue()));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("GetBaseValue %f"), AttributeSet->Health.GetBaseValue()));
 	
 	
 }
 
+void ATP_EnemyCharacterBase::OnGameplayEffectApplied(UAbilitySystemComponent * Source, const FGameplayEffectSpec & Spec, FActiveGameplayEffectHandle Handle)
+{
+	//Instigate only player
+	bool IsPlayer = Source->GetAvatarActor()->GetInstigatorController()->IsPlayerController();
+
+	if (!IsPlayer)
+	{
+		return;
+	}
+
+	FGameplayTagContainer ContainTags;
+	Spec.GetAllAssetTags(ContainTags);
+
+	if (ContainTags.HasAny(InstigateTags) && !ASCSourceInstigator)
+	{
+		ASCSourceInstigator = Source;
+		OnInstigateDelegate.Broadcast(ASCSourceInstigator);
+	}
+
+}
+
+
+//void ATP_EnemyCharacterBase::Death_Implementation()
+//{
+//
+//}
+
+void ATP_EnemyCharacterBase::Death()
+{
+	UE_LOG(LogTemp, Warning, TEXT("dddddddddddddddddddddd"));
+	OnEnemyDeathDelegate.Broadcast();
+	//ASCSourceInstigate = nullptr;
+	AbilitySystemComponent->OnGameplayEffectAppliedDelegateToSelf.RemoveAll(this);
+}
+
+void ATP_EnemyCharacterBase::HealthChanged(const FOnAttributeChangeData & Data)
+{
+	
+	if (!IsAlive() && !AbilitySystemComponent->HasMatchingGameplayTag(DeadTag))
+	{
+		
+		//damage from the effect
+		if (Data.GEModData)
+		{
+			FGameplayEffectContextHandle Context = Data.GEModData->EffectSpec.GetContext();
+			UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
+			UAbilitySystemComponent* SourceAbilitySystemComponent = Context.GetOriginalInstigatorAbilitySystemComponent();
+			//AActor* SourceActor = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->AvatarActor : nullptr;
+			if (SourceAbilitySystemComponent)
+			{
+				ASCSourceDeath = SourceAbilitySystemComponent;
+			}
+
+		}
+		
+		Death();
+	}
+}
 // Called every frame
 void ATP_EnemyCharacterBase::Tick(float DeltaTime)
 {
@@ -47,61 +113,36 @@ void ATP_EnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 }
 
-UAbilitySystemComponent * ATP_EnemyCharacterBase::GetAbilitySystemComponent() const
+bool ATP_EnemyCharacterBase::IsAlive() const
 {
-	return AbilitySystemComponent;
+	return AttributeSet->GetHealth() > 0.0f;
 }
 
-void ATP_EnemyCharacterBase::AddCharacterAbilities_Implementation()
+UAbilitySystemComponent * ATP_EnemyCharacterBase::GetASCSourceInstigator()
 {
-	// Grant abilities, but only on the server	
-	if (IsValid(AbilitySystemComponent))
-	{
-		for (TSubclassOf<UGameplayAbility>& StartupAbility : EnemyAbilities)
-		{
-			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, 1));
-		}
-	}
-
+	return ASCSourceInstigator;
+	
 }
 
-bool ATP_EnemyCharacterBase::AddCharacterAbilities_Validate()
+UAbilitySystemComponent * ATP_EnemyCharacterBase::GetASCSourceDeath()
 {
-	return true;
-}
-
-void ATP_EnemyCharacterBase::AddStartupEffects()
-{
-	if (!AbilitySystemComponent) {
-		return;
-	}
-
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	for (TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
-	{
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
-		if (SpecHandle.IsValid())
-		{
-			
-			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-		}
-	}
+	return ASCSourceDeath;
 
 }
 
-void ATP_EnemyCharacterBase::InitializeAttributes()
+void ATP_EnemyCharacterBase::SetASCSourceInstigator(UAbilitySystemComponent * value)
 {
-
-	if (AbilitySystemComponent && AttributeSet) {
-		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-		EffectContext.AddSourceObject(this);
-
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributeEffect, 1, EffectContext);
-
-		if (SpecHandle.IsValid()) {
-			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-		}
-	}
+	ASCSourceInstigator = value;
 }
+
+
+
+int ATP_EnemyCharacterBase::GetPointsPerKill()
+{
+	return PointsPerKill;
+}
+
+//int ATP_EnemyCharacterBase::GetBaseDamage()
+//{
+//	return BaseDamage;
+//}

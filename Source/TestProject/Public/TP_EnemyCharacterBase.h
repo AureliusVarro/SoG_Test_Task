@@ -8,56 +8,96 @@
 #include "AttributeSet.h"
 #include "TP_AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "TP_EnemyAttributeSet.h"
+#include "../TestProject.h"
+#include "Characters/TP_CharacterBase.h"
+#include "Components/StaticMeshComponent.h"
 #include "TP_EnemyCharacterBase.generated.h"
 
-UCLASS()
-class TESTPROJECT_API ATP_EnemyCharacterBase : public ACharacter, public IAbilitySystemInterface
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnemyDeathDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInstigateDelegate, UAbilitySystemComponent*, ASCSourceInstigator);
+
+UCLASS(config=Game)
+class TESTPROJECT_API ATP_EnemyCharacterBase : public ATP_CharacterBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	ATP_EnemyCharacterBase();
+    // Sets default values for this character's properties
+    ATP_EnemyCharacterBase();
+
+	UPROPERTY(BlueprintAssignable, Category = "Abilities | Attributes")
+		FOnEnemyDeathDelegate OnEnemyDeathDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Abilities | Attributes")
+		FOnInstigateDelegate OnInstigateDelegate;
+
+    //UFUNCTION(BlueprintNativeEvent)
+    void Death();
+
+    //virtual void Death_Implementation();
+
+    // Attribute changed callbacks
+    virtual void HealthChanged(const FOnAttributeChangeData& Data);
+
 
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	//Source ASC Instigator
+	UAbilitySystemComponent* ASCSourceInstigator = nullptr;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//Source ASC killer
+	UAbilitySystemComponent* ASCSourceDeath = nullptr;
 
-	// Inherited via IAbilitySystemInterface
+	FGameplayTag DeadTag;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Abilities, meta = (AllowPrivateAccess = "true"))
-		class UAbilitySystemComponent* AbilitySystemComponent;
+	//this effects that should instigate enemy 
+	UPROPERTY(EditAnywhere, Category = "EnemyParameters")
+		FGameplayTagContainer InstigateTags;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities | Attributes", meta = (AllowPrivateAccess = "true"))
-		class UTP_AttributeSet* AttributeSet;
+	/*UPROPERTY(EditAnywhere, Category = "EnemyParameters")
+		int BaseDamage = 0;*/
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-		TArray<TSubclassOf<class UGameplayAbility>> EnemyAbilities;
+	UPROPERTY(EditAnywhere, Category = "EnemyParameters")
+		int PointsPerKill=0;
 
-	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
-		void AddCharacterAbilities();
+	//UPROPERTY(EditAnywhere, Category = "EnemyParameters")
+	//	float RangeAttack = 0.0f;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities | Attributes")
-		TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
+	UFUNCTION()
+		void OnGameplayEffectApplied(UAbilitySystemComponent* Source, const FGameplayEffectSpec& Spec, FActiveGameplayEffectHandle Handle);
 
-	// These effects are only applied one time on startup
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-		TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+    //UPROPERTY()
+   // bool bIsDead;
 
-	virtual void AddStartupEffects();
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
+
+    // Called to bind functionality to input
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities | Attributes")
+		bool IsAlive() const;
+
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+		UAbilitySystemComponent* GetASCSourceInstigator();
+
+	//UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+		UAbilitySystemComponent* GetASCSourceDeath();
+
+	//void SetSourceAttack(UAbilitySystemComponent* DamageSource);
+	UFUNCTION(BlueprintCallable)
+		void SetASCSourceInstigator(UAbilitySystemComponent* ASCSourceInstigator);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+		int GetPointsPerKill();
+
+	/*UFUNCTION(BlueprintCallable, BlueprintPure)
+		int GetBaseDamage();*/
 	
-	virtual void InitializeAttributes();
-
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-
-
 };
