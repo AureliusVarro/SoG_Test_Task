@@ -18,6 +18,9 @@
 			"Name": "GameplayAbilities",
 			"Enabled": true
 		},
-		
+		{
+			"Name": "MultiUserClient",
+			"Enabled": true
+		}
 	]
 }
