@@ -15,7 +15,6 @@ ATP_WeaponBase::ATP_WeaponBase()
 	WeaponMesh->CastShadow = true;
 	WeaponMesh->SetVisibility(true, true);
 	WeaponMesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPose;
-
 }
 
 UAbilitySystemComponent* ATP_WeaponBase::GetAbilitySystemComponent() const
@@ -153,6 +152,7 @@ void ATP_WeaponBase::SetMaxClipAmmo(int32 NewMaxClipAmmo)
 void ATP_WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
+	WeaponMesh->SetVisibility(false, true);
 	ClipAmmo = MaxClipAmmo;	
 }
 
