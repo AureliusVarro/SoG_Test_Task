@@ -33,10 +33,10 @@ UTP_DamagetExecCalculation::UTP_DamagetExecCalculation()
 	//RelevantAttributesToCapture - это массив, содержащий все атрибуты, которые вы хотите захватить, без исключений.
     //Благодаря этому, позже в AttemptCalculateCapturedAttributeMagnitude() методе мы сможем запросить данные параметры
 	RelevantAttributesToCapture.Add(DamageStatics().HealthDef);
-	InvalidScopedModifierAttributes.Add(DamageStatics().HealthDef);
+	/*InvalidScopedModifierAttributes.Add(DamageStatics().HealthDef);*/
 
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
-	InvalidScopedModifierAttributes.Add(DamageStatics().ArmorDef);
+	/*InvalidScopedModifierAttributes.Add(DamageStatics().ArmorDef);*/
 
 }
 
