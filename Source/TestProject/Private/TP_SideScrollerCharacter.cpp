@@ -157,6 +157,10 @@ void ATP_SideScrollerCharacter::InitializeWeapons()
 		Weapons.Add(ThisWeapon);
 		ThisWeapon->SetOwningCharacter(this);
 		//last weapon in list will be equipped after init
+		if(CurrentWeapon)
+		{
+			CurrentWeapon->Unequip();
+		}
 		CurrentWeapon = ThisWeapon;
 		CurrentWeapon->Equip();
 		
