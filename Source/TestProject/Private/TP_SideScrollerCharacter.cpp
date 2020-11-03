@@ -156,12 +156,13 @@ void ATP_SideScrollerCharacter::InitializeWeapons()
 		ATP_WeaponBase* ThisWeapon = GetWorld()->SpawnActor<ATP_WeaponBase>(WeaponClass, Location, Rotation, SpawnInfo);
 		Weapons.Add(ThisWeapon);
 		ThisWeapon->SetOwningCharacter(this);
-
-		if(ThisWeapon->WeaponTag == CurrentWeaponTag)
+		//last weapon in list will be equipped after init
+		if(CurrentWeapon)
 		{
-			CurrentWeapon = ThisWeapon;
-			CurrentWeapon->Equip();
+			CurrentWeapon->Unequip();
 		}
+		CurrentWeapon = ThisWeapon;
+		CurrentWeapon->Equip();
 		
 	}
 }
